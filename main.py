@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
 
+
 # Import routers
 from routers import documents, comparison, search, admin
 from database import init_database
@@ -41,14 +42,15 @@ app.include_router(search.router, prefix="/api/search", tags=["Search"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 # Serve static files
-frontend_path = Path(__file__).parent / "frontend" / "dist"
+frontend_path = Path(__file__).parent / "frontend"
 if frontend_path.exists():
+    # Serve static files
     app.mount("/static", StaticFiles(directory=str(frontend_path / "static")), name="static")
 
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup"""
-    print(f"🚀 Starting {Config.APP_NAME} v{Config.APP_VERSION}")
+    print(f"ðŸš€ Starting {Config.APP_NAME} v{Config.APP_VERSION}")
     
     # Validate configuration
     Config.validate_config()
@@ -59,16 +61,30 @@ async def startup_event():
     # Ensure upload folder exists
     Config.ensure_upload_folder()
     
-    print(f"✅ Application initialized successfully")
-    print(f"📊 Database: {Config.get_database_path()}")
-    print(f"📁 Upload folder: {Config.ensure_upload_folder()}")
+    print(f"âœ… Application initialized successfully")
+    print(f"ðŸ“Š Database: {Config.get_database_path()}")
+    print(f"ðŸ“ Upload folder: {Config.ensure_upload_folder()}")
 
 @app.get("/")
 async def root():
-    """Serve React frontend"""
-    if frontend_path.exists():
-        return FileResponse(str(frontend_path / "index.html"))
+    """Serve the main frontend application"""
+    frontend_file = Path(__file__).parent / "frontend" / "index.html"
+    if frontend_file.exists():
+        return FileResponse(str(frontend_file))
     return {"message": f"Welcome to {Config.APP_NAME} API", "version": Config.APP_VERSION}
+
+# Catch-all route for SPA support (React Router-like behavior)
+@app.get("/{path:path}")
+async def catch_all(path: str):
+    """Serve frontend for all non-API routes"""
+    # Skip API routes
+    if path.startswith("api/"):
+        return {"error": "API endpoint not found"}
+    
+    frontend_file = Path(__file__).parent / "frontend" / "index.html"
+    if frontend_file.exists():
+        return FileResponse(str(frontend_file))
+    return {"error": "Frontend not found"}
 
 @app.get("/health")
 async def health_check():
@@ -93,6 +109,6 @@ if __name__ == "__main__":
         "main:app",
         host=Config.HOST,
         port=Config.PORT,
-        reload=Config.DEBUG,
+        reload=False,
         log_level="info"
     )

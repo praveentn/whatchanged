@@ -1,0 +1,490 @@
+<!-- app/frontend/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuReview Pro - Enterprise Document Management</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- Application Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <div class="brand">
+                <i class="fas fa-file-alt brand-icon"></i>
+                <h1>DocuReview Pro</h1>
+                <span class="version">v1.0</span>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </button>
+                <button class="nav-btn" data-page="documents">
+                    <i class="fas fa-folder-open"></i>
+                    Documents
+                </button>
+                <button class="nav-btn" data-page="comparison">
+                    <i class="fas fa-code-compare"></i>
+                    Compare
+                </button>
+                <button class="nav-btn" data-page="search">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+                <button class="nav-btn" data-page="admin">
+                    <i class="fas fa-cog"></i>
+                    Admin
+                </button>
+            </nav>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="upload-btn">
+                    <i class="fas fa-upload"></i>
+                    Upload Document
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <section id="dashboard-page" class="page active">
+            <div class="page-header">
+                <h2>Dashboard</h2>
+                <p>System overview and recent activity</p>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-file-text"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="total-documents">-</h3>
+                        <p>Total Documents</p>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="analyzed-documents">-</h3>
+                        <p>Analyzed</p>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-code-compare"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="total-comparisons">-</h3>
+                        <p>Comparisons</p>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 id="search-readiness">-</h3>
+                        <p>Search Ready</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Recent Documents</h3>
+                <div id="recent-documents" class="document-grid">
+                    <!-- Recent documents will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Documents Page -->
+        <section id="documents-page" class="page">
+            <div class="page-header">
+                <h2>Document Management</h2>
+                <div class="page-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="document-search" placeholder="Search documents...">
+                    </div>
+                    <select id="domain-filter">
+                        <option value="">All Domains</option>
+                        <option value="technical">Technical</option>
+                        <option value="business">Business</option>
+                        <option value="legal">Legal</option>
+                    </select>
+                    <select id="status-filter">
+                        <option value="">All Status</option>
+                        <option value="uploaded">Uploaded</option>
+                        <option value="analyzing">Analyzing</option>
+                        <option value="indexed">Indexed</option>
+                        <option value="error">Error</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="documents-container" class="documents-container">
+                <!-- Documents will be loaded here -->
+            </div>
+            
+            <div id="pagination" class="pagination">
+                <!-- Pagination controls -->
+            </div>
+        </section>
+
+        <!-- Comparison Page -->
+        <section id="comparison-page" class="page">
+            <div class="page-header">
+                <h2>Document Comparison</h2>
+                <p>Compare document versions with AI-powered analysis</p>
+            </div>
+            
+            <div class="comparison-setup">
+                <div class="comparison-selectors">
+                    <div class="selector-group">
+                        <label>Document A</label>
+                        <select id="doc-a-select" class="doc-select">
+                            <option value="">Select document...</option>
+                        </select>
+                        <select id="version-a-select" class="version-select">
+                            <option value="">Select version...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="vs-separator">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        <span>VS</span>
+                    </div>
+                    
+                    <div class="selector-group">
+                        <label>Document B</label>
+                        <select id="doc-b-select" class="doc-select">
+                            <option value="">Select document...</option>
+                        </select>
+                        <select id="version-b-select" class="version-select">
+                            <option value="">Select version...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="comparison-config">
+                    <div class="config-row">
+                        <label>Granularity:</label>
+                        <select id="granularity-select">
+                            <option value="word">Word Level</option>
+                            <option value="sentence">Sentence Level</option>
+                            <option value="paragraph">Paragraph Level</option>
+                        </select>
+                    </div>
+                    
+                    <div class="config-row">
+                        <label>Algorithm:</label>
+                        <select id="algorithm-select">
+                            <option value="hybrid">Hybrid (Recommended)</option>
+                            <option value="semantic">Semantic</option>
+                            <option value="syntactic">Syntactic</option>
+                        </select>
+                    </div>
+                    
+                    <div class="config-row">
+                        <label>Similarity Threshold:</label>
+                        <input type="range" id="similarity-threshold" min="0" max="1" step="0.1" value="0.8">
+                        <span id="threshold-value">0.8</span>
+                    </div>
+                </div>
+                
+                <button id="compare-btn" class="btn btn-primary btn-large">
+                    <i class="fas fa-code-compare"></i>
+                    Compare Documents
+                </button>
+            </div>
+            
+            <div id="comparison-results" class="comparison-results" style="display: none;">
+                <!-- Comparison results will be displayed here -->
+            </div>
+        </section>
+
+        <!-- Search Page -->
+        <section id="search-page" class="page">
+            <div class="page-header">
+                <h2>Semantic Search</h2>
+                <p>AI-powered document search and discovery</p>
+            </div>
+            
+            <div class="search-interface">
+                <div class="search-input-container">
+                    <input type="text" id="semantic-search-input" placeholder="Search across all documents..." class="search-input">
+                    <button id="semantic-search-btn" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Search
+                    </button>
+                </div>
+                
+                <div class="search-filters">
+                    <select id="search-scope">
+                        <option value="all">All Content</option>
+                        <option value="titles">Titles Only</option>
+                        <option value="summaries">Summaries</option>
+                    </select>
+                    
+                    <select id="intent-filter">
+                        <option value="">All Intents</option>
+                        <option value="overview">Overview</option>
+                        <option value="requirements">Requirements</option>
+                        <option value="design">Design</option>
+                        <option value="risks">Risks</option>
+                        <option value="procedure">Procedure</option>
+                        <option value="example">Example</option>
+                        <option value="conclusion">Conclusion</option>
+                    </select>
+                    
+                    <input type="number" id="search-limit" value="20" min="1" max="100" placeholder="Results limit">
+                </div>
+            </div>
+            
+            <div id="search-results" class="search-results">
+                <!-- Search results will be displayed here -->
+            </div>
+        </section>
+
+        <!-- Admin Page -->
+        <section id="admin-page" class="page">
+            <div class="page-header">
+                <h2>System Administration</h2>
+                <p>Database operations and system management</p>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="sql-executor">
+                    <i class="fas fa-database"></i>
+                    SQL Executor
+                </button>
+                <button class="tab-btn" data-tab="system-stats">
+                    <i class="fas fa-chart-bar"></i>
+                    System Stats
+                </button>
+                <button class="tab-btn" data-tab="audit-logs">
+                    <i class="fas fa-history"></i>
+                    Audit Logs
+                </button>
+                <button class="tab-btn" data-tab="maintenance">
+                    <i class="fas fa-tools"></i>
+                    Maintenance
+                </button>
+            </div>
+            
+            <!-- SQL Executor Tab -->
+            <div id="sql-executor-tab" class="tab-content active">
+                <div class="sql-interface">
+                    <div class="sql-editor">
+                        <textarea id="sql-query" placeholder="Enter your SQL query here...
+Examples:
+SELECT * FROM documents ORDER BY created_at DESC LIMIT 10;
+SELECT COUNT(*) FROM chunks WHERE intent_label = 'requirements';
+SELECT doc_slug, version_a, version_b, similarity_score FROM comparisons;"></textarea>
+                        <div class="sql-actions">
+                            <button id="execute-sql" class="btn btn-primary">
+                                <i class="fas fa-play"></i>
+                                Execute Query
+                            </button>
+                            <button id="clear-sql" class="btn btn-secondary">
+                                <i class="fas fa-eraser"></i>
+                                Clear
+                            </button>
+                            <button id="export-results" class="btn btn-secondary">
+                                <i class="fas fa-download"></i>
+                                Export Results
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="sql-results" class="sql-results">
+                        <div class="results-header">
+                            <h4>Query Results</h4>
+                            <div class="results-info">
+                                <span id="execution-time">-</span>
+                                <span id="row-count">-</span>
+                            </div>
+                        </div>
+                        <div id="results-table" class="results-table">
+                            <p class="no-results">Execute a query to see results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Stats Tab -->
+            <div id="system-stats-tab" class="tab-content">
+                <div id="system-stats-content">
+                    <!-- System statistics will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Audit Logs Tab -->
+            <div id="audit-logs-tab" class="tab-content">
+                <div class="audit-controls">
+                    <select id="operation-filter">
+                        <option value="">All Operations</option>
+                        <option value="upload">Upload</option>
+                        <option value="analyze">Analyze</option>
+                        <option value="compare">Compare</option>
+                        <option value="delete">Delete</option>
+                    </select>
+                    <input type="date" id="start-date">
+                    <input type="date" id="end-date">
+                    <button id="filter-logs" class="btn btn-primary">Filter</button>
+                </div>
+                <div id="audit-logs-content">
+                    <!-- Audit logs will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Maintenance Tab -->
+            <div id="maintenance-tab" class="tab-content">
+                <div class="maintenance-operations">
+                    <div class="operation-card">
+                        <h4>Cleanup Old Comparisons</h4>
+                        <p>Remove comparison records older than specified days</p>
+                        <div class="operation-controls">
+                            <input type="number" id="cleanup-days" value="30" min="1">
+                            <label>days</label>
+                            <button class="btn btn-warning" onclick="performMaintenance('cleanup_old_comparisons')">
+                                <i class="fas fa-trash"></i>
+                                Cleanup
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="operation-card">
+                        <h4>Database Vacuum</h4>
+                        <p>Optimize database size and performance</p>
+                        <button class="btn btn-info" onclick="performMaintenance('vacuum_database')">
+                            <i class="fas fa-compress"></i>
+                            Vacuum Database
+                        </button>
+                    </div>
+                    
+                    <div class="operation-card">
+                        <h4>Create Backup</h4>
+                        <p>Create a backup of the database</p>
+                        <button class="btn btn-success" onclick="createBackup()">
+                            <i class="fas fa-save"></i>
+                            Create Backup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload Document</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="upload-form" class="modal-body">
+                <div class="form-group">
+                    <label for="file-input">Document File</label>
+                    <div class="file-input-container">
+                        <input type="file" id="file-input" accept=".txt,.md" required>
+                        <label for="file-input" class="file-input-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            Choose File
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="doc-title">Title</label>
+                    <input type="text" id="doc-title" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="doc-author">Author</label>
+                        <input type="text" id="doc-author">
+                    </div>
+                    <div class="form-group">
+                        <label for="doc-domain">Domain</label>
+                        <select id="doc-domain">
+                            <option value="">Select domain...</option>
+                            <option value="technical">Technical</option>
+                            <option value="business">Business</option>
+                            <option value="legal">Legal</option>
+                            <option value="marketing">Marketing</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="doc-tags">Tags (comma-separated)</label>
+                    <input type="text" id="doc-tags" placeholder="requirements, system, documentation">
+                </div>
+                
+                <div class="form-group">
+                    <label for="doc-notes">Notes</label>
+                    <textarea id="doc-notes" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="auto-analyze" checked>
+                        <span class="checkmark"></span>
+                        Automatically analyze after upload
+                    </label>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                <button type="submit" form="upload-form" class="btn btn-primary">Upload Document</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Detail Modal -->
+    <div id="document-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="doc-modal-title">Document Details</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="doc-modal-content" class="modal-body">
+                <!-- Document details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notifications" class="notifications">
+        <!-- Notifications will appear here -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/components.js"></script>
+    <script src="/static/js/admin.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

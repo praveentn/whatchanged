@@ -556,21 +556,21 @@ async def _analyze_document_background(analysis_service: AnalysisService, docume
                                      force_reanalysis: bool = False):
     """Background task for document analysis"""
     try:
-        print(f"🔄 Starting background analysis for document {document_id}")
+        print(f"ðŸ”„ Starting background analysis for document {document_id}")
         result = await analysis_service.analyze_document(document_id, force_reanalysis)
         
         if "error" in result:
-            print(f"❌ Background analysis failed: {result['error']}")
+            print(f"âŒ Background analysis failed: {result['error']}")
         else:
-            print(f"✅ Background analysis completed for document {document_id}")
+            print(f"âœ… Background analysis completed for document {document_id}")
             
     except Exception as e:
-        print(f"❌ Background analysis exception: {e}")
+        print(f"âŒ Background analysis exception: {e}")
 
 if __name__ == "__main__":
     # Test the router
-    print("🧪 Documents router loaded successfully!")
-    print("📋 Available endpoints:")
+    print("ðŸ§ª Documents router loaded successfully!")
+    print("ðŸ“‹ Available endpoints:")
     for route in router.routes:
         if hasattr(route, 'methods') and hasattr(route, 'path'):
             methods = list(route.methods)

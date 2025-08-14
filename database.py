@@ -194,60 +194,126 @@ def init_database():
 def execute_raw_sql(query: str, params: tuple = None):
     """
     Execute raw SQL query for admin operations
+    Enhanced to handle both single and multiple statements
     
     Args:
-        query (str): SQL query to execute
+        query (str): SQL query to execute (can be multiple statements)
         params (tuple, optional): Query parameters
     
     Returns:
         dict: Query results with metadata
-    
-    Example:
-        result = execute_raw_sql("SELECT * FROM documents LIMIT 5")
-        result = execute_raw_sql("SELECT * FROM documents WHERE id = ?", (1,))
     """
     try:
         # Use direct sqlite3 connection for raw queries
         conn = sqlite3.connect(Config.DB_PATH)
         conn.row_factory = sqlite3.Row  # Enable column name access
-        cursor = conn.cursor()
         
         start_time = datetime.utcnow()
         
-        if params:
-            cursor.execute(query, params)
-        else:
-            cursor.execute(query)
+        # Handle multiple statements separated by semicolon
+        statements = [stmt.strip() for stmt in query.split(';') if stmt.strip()]
         
-        execution_time = (datetime.utcnow() - start_time).total_seconds() * 1000
-        
-        # Handle different query types
-        if query.strip().upper().startswith(('SELECT', 'WITH', 'PRAGMA')):
-            # Query with results
-            rows = cursor.fetchall()
-            columns = [description[0] for description in cursor.description] if cursor.description else []
+        if len(statements) == 1:
+            # Single statement - handle normally
+            cursor = conn.cursor()
             
-            result = {
-                "success": True,
-                "query_type": "SELECT",
-                "rows": [dict(row) for row in rows],
-                "columns": columns,
-                "row_count": len(rows),
-                "execution_time_ms": round(execution_time, 2)
-            }
+            if params:
+                cursor.execute(statements[0], params)
+            else:
+                cursor.execute(statements[0])
+            
+            execution_time = (datetime.utcnow() - start_time).total_seconds() * 1000
+            
+            # Handle different query types
+            if statements[0].strip().upper().startswith(('SELECT', 'WITH', 'PRAGMA')):
+                # Query with results
+                rows = cursor.fetchall()
+                columns = [description[0] for description in cursor.description] if cursor.description else []
+                
+                result = {
+                    "success": True,
+                    "query_type": "SELECT",
+                    "rows": [dict(row) for row in rows],
+                    "columns": columns,
+                    "row_count": len(rows),
+                    "execution_time_ms": round(execution_time, 2)
+                }
+            else:
+                # DML/DDL operation
+                conn.commit()
+                result = {
+                    "success": True,
+                    "query_type": "DML/DDL",
+                    "rows_affected": cursor.rowcount,
+                    "execution_time_ms": round(execution_time, 2)
+                }
+            
+            cursor.close()
+            
         else:
-            # DML/DDL operation
+            # Multiple statements - execute them sequentially
+            cursor = conn.cursor()
+            results = []
+            total_rows_affected = 0
+            last_select_result = None
+            
+            for i, statement in enumerate(statements):
+                try:
+                    if params and i == 0:  # Only apply params to first statement
+                        cursor.execute(statement, params)
+                    else:
+                        cursor.execute(statement)
+                    
+                    if statement.strip().upper().startswith(('SELECT', 'WITH', 'PRAGMA')):
+                        # Store the last SELECT result
+                        rows = cursor.fetchall()
+                        columns = [description[0] for description in cursor.description] if cursor.description else []
+                        last_select_result = {
+                            "rows": [dict(row) for row in rows],
+                            "columns": columns,
+                            "row_count": len(rows)
+                        }
+                    else:
+                        total_rows_affected += cursor.rowcount
+                
+                except Exception as stmt_error:
+                    conn.rollback()
+                    cursor.close()
+                    conn.close()
+                    return {
+                        "success": False,
+                        "error": f"Error in statement {i+1}: {str(stmt_error)}",
+                        "query": statement[:100] + "..." if len(statement) > 100 else statement
+                    }
+            
             conn.commit()
-            result = {
-                "success": True,
-                "query_type": "DML/DDL",
-                "rows_affected": cursor.rowcount,
-                "execution_time_ms": round(execution_time, 2)
-            }
+            execution_time = (datetime.utcnow() - start_time).total_seconds() * 1000
+            
+            # Return result based on what type of statements were executed
+            if last_select_result:
+                # If there was a SELECT statement, return its results
+                result = {
+                    "success": True,
+                    "query_type": "MULTIPLE_WITH_SELECT",
+                    "rows": last_select_result["rows"],
+                    "columns": last_select_result["columns"],
+                    "row_count": last_select_result["row_count"],
+                    "statements_executed": len(statements),
+                    "execution_time_ms": round(execution_time, 2)
+                }
+            else:
+                # All were DML/DDL statements
+                result = {
+                    "success": True,
+                    "query_type": "MULTIPLE_DML_DDL",
+                    "statements_executed": len(statements),
+                    "total_rows_affected": total_rows_affected,
+                    "execution_time_ms": round(execution_time, 2)
+                }
+            
+            cursor.close()
         
-        cursor.close()
         conn.close()
-        
         return result
         
     except Exception as e:
@@ -256,6 +322,7 @@ def execute_raw_sql(query: str, params: tuple = None):
             "error": str(e),
             "query": query[:200] + "..." if len(query) > 200 else query
         }
+
 
 if __name__ == "__main__":
     # Test database initialization

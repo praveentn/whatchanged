@@ -1,0 +1,120 @@
+=== ENHANCED LICENSE ANALYZER DEBUG REPORT ===
+
+Test Timestamp: 2025-08-13T07:31:03.222384
+Execution Mode: async
+Total Tests: 2
+
+=== FIELD MAPPING ANALYSIS ===
+
+API Response Fields Found:
+ - ai_attribution
+ - analysis_method
+ - assumptions_made
+ - attribution_citation
+ - attribution_confidence
+ - attribution_required
+ - commercial_use_allowed
+ - commercial_use_citation
+ - commercial_use_confidence
+ - confidence_score
+ - contact_citation
+ - contact_info
+ - detailed_citations
+ - license_database_match
+ - license_type
+ - license_type_citation
+ - license_type_confidence
+ - missing_information
+ - modification_allowed
+ - modification_citation
+ - modification_confidence
+ - potential_new_license
+ - redistribution_allowed
+ - redistribution_citation
+ - redistribution_confidence
+ - summary
+ - terms_and_conditions
+ - terms_citations
+ - usage_restrictions
+ - usage_restrictions_citations
+
+Expected Field Mappings:
+ - ContentPermission -> usage_restrictions [✅ FOUND]
+ - CommercialUse -> commercial_use_allowed [✅ FOUND]
+ - AttributionRequired -> attribution_required [✅ FOUND]
+
+=== SAMPLE API RESPONSES ===
+
+--- Sample Response 1 ---
+Success: True
+Analysis Type: enhanced_smart_analysis
+License Info:
+ license_type: Creative Commons Attribution 4.0 International License
+ license_type_citation: The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.
+ license_type_confidence: 1.0
+ commercial_use_allowed: True
+ commercial_use_citation: The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.
+ commercial_use_confidence: 1.0
+ attribution_required: True
+ attribution_citation: The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.
+ attribution_confidence: 1.0
+ redistribution_allowed: True
+ redistribution_citation: The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.
+ redistribution_confidence: 1.0
+ modification_allowed: True
+ modification_citation: The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.
+ modification_confidence: 1.0
+ usage_restrictions: API usage is in beta; users are asked to keep volume low and use with caution in production settings. Some high-resolution geospatial data is only available upon request.
+ usage_restrictions_citations: ['As a beta release, we cannot guarantee availability of the Climate TRACE API; please keep volume low and use it with caution in production settings.', 'Due to the large file size, these versions of the data are available only upon request. Before making a request for the data, please first examine the download packages and determine if those might satisfy your needs.']
+ terms_and_conditions: Users are prompted to voluntarily share details about their potential use of the data. Contact is encouraged for technical questions or requests for detailed data. Submission of forms implies agreement to the privacy policy.
+ terms_citations: ['When you download data, you will be prompted to voluntarily share details about your potential use of the data. This information helps us to further enhance the Climate TRACE platform, and we encourage you to respond.', 'If you have a query about the data, please use our contact page to get in touch.', 'By submitting this form, I agree to the Climate TRACE privacy policy.']
+ ai_attribution: None
+ contact_info: Contact page available for queries: https://climatetrace.org/contact
+ contact_citation: If you have a query about the data, please use our contact page to get in touch.
+ detailed_citations: [{'claim': 'License type is Creative Commons Attribution 4.0 International', 'text_snippet': 'The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.', 'confidence': 1.0, 'context': 'Found in multiple places describing the dataset license.'}, {'claim': 'Commercial use is allowed under CC BY 4.0', 'text_snippet': 'The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.', 'confidence': 1.0, 'context': 'CC BY 4.0 allows commercial use.'}, {'claim': 'Attribution is required', 'text_snippet': 'The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.', 'confidence': 1.0, 'context': 'CC BY 4.0 requires attribution.'}, {'claim': 'Redistribution is allowed', 'text_snippet': 'The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.', 'confidence': 1.0, 'context': 'CC BY 4.0 allows redistribution.'}, {'claim': 'Modification is allowed', 'text_snippet': 'The data are licensed under the Creative Commons Attribution 4.0 International License; more details can be found on our terms of use page.', 'confidence': 1.0, 'context': 'CC BY 4.0 allows modification.'}, {'claim': 'API usage restriction (beta, low volume, caution in production)', 'text_snippet': 'As a beta release, we cannot guarantee availability of the Climate TRACE API; please keep volume low and use it with caution in production settings.', 'confidence': 1.0, 'context': 'API section.'}, {'claim': 'High-resolution geospatial data only available upon request', 'text_snippet': 'Due to the large file size, these versions of the data are available only upon request. Before making a request for the data, please first examine the download packages and determine if those might satisfy your needs.', 'confidence': 1.0, 'context': 'Geospatial data section.'}, {'claim': 'Users prompted to share details about data use', 'text_snippet': 'When you download data, you will be prompted to voluntarily share details about your potential use of the data.', 'confidence': 1.0, 'context': 'Download process.'}, {'claim': 'Contact information available via contact page', 'text_snippet': 'If you have a query about the data, please use our contact page to get in touch.', 'confidence': 1.0, 'context': 'Contact section.'}, {'claim': 'Submission of forms implies agreement to privacy policy', 'text_snippet': 'By submitting this form, I agree to the Climate TRACE privacy policy.', 'confidence': 1.0, 'context': 'Form submission section.'}]
+ confidence_score: 1.0
+ analysis_method: citation_based_analysis
+ summary: Climate TRACE data is licensed under the Creative Commons Attribution 4.0 International License, permitting commercial use, redistribution, and modification with required attribution. API usage is restricted due to its beta status, and some high-resolution geospatial data is only available upon request. Users are encouraged to share details about their intended use and must agree to the privacy policy when submitting forms. Contact is available via the website's contact page.
+ assumptions_made: []
+ missing_information: ['No explicit mention of A.I. attribution requirements.', 'No detailed terms of use text found (only referenced).', 'No explicit restrictions on commercial use beyond CC BY 4.0 standard.', 'No explicit mention of embargoes or field-of-use restrictions.']
+ license_database_match: False
+ potential_new_license: True
+
+--- Sample Response 2 ---
+Success: True
+Analysis Type: enhanced_smart_analysis
+License Info:
+ license_type: Copyrights and Reuse Policy
+ license_type_citation: EIA data is provided free of charge and should be used in compliance with our Copyrights and Reuse Policy.
+ license_type_confidence: 0.9
+ commercial_use_allowed: None
+ commercial_use_citation: None
+ commercial_use_confidence: 0.0
+ attribution_required: None
+ attribution_citation: None
+ attribution_confidence: 0.0
+ redistribution_allowed: None
+ redistribution_citation: None
+ redistribution_confidence: 0.0
+ modification_allowed: None
+ modification_citation: None
+ modification_confidence: 0.0
+ usage_restrictions: Registration and compliance with the API Terms of Service Agreement help EIA monitor usage and ensure service availability.
+ usage_restrictions_citations: ['Registration and compliance with the API Terms of Service Agreement help EIA monitor usage and ensure service availability.', 'EIA data is provided free of charge and should be used in compliance with our Copyrights and Reuse Policy.']
+ terms_and_conditions: Users must register for an API key and comply with the API Terms of Service Agreement. Data usage must comply with the Copyrights and Reuse Policy.
+ terms_citations: ['Register Forgot API Key Registration and compliance with the API Terms of Service Agreement help EIA monitor usage and ensure service availability.', 'EIA data is provided free of charge and should be used in compliance with our Copyrights and Reuse Policy.']
+ ai_attribution: None
+ contact_info: U.S. Energy Information Administration 1000 Independence Ave., SW Washington, DC 20585
+ contact_citation: Contact Us U.S. Energy Information Administration 1000 Independence Ave., SW Washington, DC 20585
+ detailed_citations: [{'claim': 'License type is Copyrights and Reuse Policy', 'text_snippet': 'EIA data is provided free of charge and should be used in compliance with our Copyrights and Reuse Policy.', 'confidence': 0.9, 'context': 'Appears in multiple places referencing data usage compliance.'}, {'claim': 'API usage requires registration and compliance with Terms of Service', 'text_snippet': 'Registration and compliance with the API Terms of Service Agreement help EIA monitor usage and ensure service availability.', 'confidence': 0.9, 'context': 'Directly follows API registration instructions.'}, {'claim': 'Contact information for EIA', 'text_snippet': 'Contact Us U.S. Energy Information Administration 1000 Independence Ave., SW Washington, DC 20585', 'confidence': 1.0, 'context': 'Footer and contact section of the page.'}]
+ confidence_score: 0.7
+ analysis_method: citation_based_analysis
+ summary: The EIA provides data free of charge, requiring compliance with its Copyrights and Reuse Policy and API Terms of Service Agreement. Registration is needed for API access. No explicit statements about commercial use, attribution, redistribution, or modification were found in the provided content. Contact information for the EIA is available.
+ assumptions_made: ['None; all claims are based on direct citations.']
+ missing_information: ['Explicit statements regarding commercial use rights.', 'Explicit statements regarding attribution requirements.', 'Explicit statements regarding redistribution rights.', 'Explicit statements regarding modification rights.', 'A.I. attribution requirements.']
+ license_database_match: False
+ potential_new_license: True
+
+=== TROUBLESHOOTING RECOMMENDATIONS ===
+
+✅ All expected fields found in API responses

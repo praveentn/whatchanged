@@ -1,7 +1,7 @@
 # dependencies.py
 """
 DocuReview Pro - FastAPI Dependencies
-Dependency injection for services and database connections
+Fixed dependency injection for services and database connections
 """
 from functools import lru_cache
 from fastapi import Depends, HTTPException, status
@@ -115,20 +115,18 @@ def validate_admin_access():
     # TODO: Implement proper authentication in future versions
     return True
 
-def get_admin_service(
-    db: Session = Depends(get_db),
-    _: bool = Depends(validate_admin_access)
-):
+def get_admin_service(db: Session = Depends(get_db)) -> Session:
     """
-    Get admin service with access validation
+    Get admin service - returns DB session for admin operations
     
     Args:
         db (Session): Database session
-        _ (bool): Admin access validation
     
     Returns:
         Session: Database session for admin operations
     """
+    # Validate admin access
+    validate_admin_access()
     return db
 
 if __name__ == "__main__":
